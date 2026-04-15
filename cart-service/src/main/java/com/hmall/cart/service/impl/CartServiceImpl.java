@@ -1,6 +1,7 @@
 package com.hmall.cart.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -16,6 +17,8 @@ import com.hmall.common.utils.CollUtils;
 import com.hmall.common.utils.UserContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -41,8 +44,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements ICartService {
 
-    // TODO private final IItemService itemService;
     private final RestTemplate restTemplate;
+    private final DiscoveryClient discoveryClient;
 
     @Override
     public void addItem2Cart(CartFormDTO cartFormDTO) {
@@ -91,16 +94,21 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
         // 2.查询商品
         //List<ItemDTO> items = itemService.queryItemByIds(itemIds);
 
-        // 2.1 利用restTemplate发起http请求，得到http的响应
+        // 2.1 根据服务名称获取服务实例列表
+        List<ServiceInstance> instances = discoveryClient.getInstances("item-service");
+        if (CollUtils.isEmpty(instances)) { return; }
+        // 2.2 负载均衡, 从服务实例列表中获取一个实例
+        ServiceInstance instance = instances.get(RandomUtil.randomInt(instances.size()));
+        // 2.3 利用restTemplate发起http请求，得到http的响应
         ResponseEntity<List<ItemDTO>> response = restTemplate.exchange(
-                "http://localhost:8081/items?ids={ids}",
+                instance.getUri() + "/items?ids={ids}",
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<ItemDTO>>() {},
                 Map.of("ids", CollUtil.join(itemIds, ","))
         );
 
-        // 2.2 解析响应
+        // 2.4 解析响应
         if(!response.getStatusCode().is2xxSuccessful()){
             // 查询失败, 直接返回
             return;
