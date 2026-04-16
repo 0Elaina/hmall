@@ -1,8 +1,11 @@
 package com.hmall.api.client;
 
 import com.hmall.api.dto.ItemDTO;
+import com.hmall.api.dto.OrderDetailDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Collection;
@@ -24,4 +27,12 @@ public interface ItemClient {
     // @RequestParam 注解将方法参数绑定到 HTTP 请求的查询参数上
     // 这里表示将 Java 中的 ids 参数序列化为 URL 中的 ?ids=1,2,3 格式
     List<ItemDTO> queryItemByIds(@RequestParam("ids") Collection<Long> ids);
+
+
+    /**
+     * 扣减库存
+     * @param items
+     */
+    @PutMapping("/items/stock/deduct")
+    void deductStock(@RequestBody List<OrderDetailDTO> items);
 }
