@@ -1,5 +1,6 @@
 package com.hmall.api.client;
 
+import com.hmall.api.client.fallback.ItemClientFallbackFactory;
 import com.hmall.api.dto.ItemDTO;
 import com.hmall.api.dto.OrderDetailDTO;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -13,7 +14,7 @@ import java.util.List;
 
 // @FeignClient 注解声明这是一个 Feign 客户端
 // "item-service" 指定了要调用的目标服务名称，OpenFeign 会从注册中心获取该服务的实例
-@FeignClient("item-service")
+@FeignClient(value = "item-service", fallbackFactory = ItemClientFallbackFactory.class)
 public interface ItemClient {
     /**
      * 根据商品ID集合查询商品信息

@@ -3,6 +3,8 @@ server:
 feign:
   okhttp:
     enabled: true # 开启OKHttp功能
+  sentinel:
+    enabled: true
 hm:
   db:
     database: hm-cart
@@ -10,3 +12,9 @@ hm:
     title: 黑马商城购物车服务接口文档
     description: 黑马商城购物车服务接口文档
     package: com.hm.cart.controller
+spring:
+  cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:8090 # 配置sentinel控制台地址
+      http-method-specify: true # 允许使用GET/POST/PUT/DELETE等HTTP方法作为请求名称
