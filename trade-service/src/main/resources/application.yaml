@@ -7,14 +7,10 @@ hm:
     title: 黑马商城交易服务接口文档
     description: 黑马商城交易服务接口文档
     package: com.hmall.trade.controller
-feign:
-  okhttp:
-    enabled: true # 开启OKHttp连接池支持
-  sentinel:
-    enabled: true # 开启Feign对Sentinel的整合
 spring:
-  cloud:
-    sentinel:
-      transport:
-        dashboard: localhost:8090 # 配置sentinel控制台地址
-      http-method-specify: true # 允许使用GET/POST/PUT/DELETE等HTTP方法作为请求名称
+  rabbitmq:
+    host: 192.168.100.130 # 你的虚拟机IP
+    port: 5672 # 端口
+    virtual-host: /hmall # 虚拟主机
+    username: hmall # 用户名
+    password: 123 # 密码
